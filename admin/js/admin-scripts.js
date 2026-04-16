@@ -1046,56 +1046,6 @@ jQuery(document).ready(function ($) {
         runBulkAction('d5tm_batch_trash', {}, 'Are you sure you want to move ' + selectedIds.length + ' items to trash?');
     });
 
-    // ============================================================
-    // v3.0.0 — Usage Audit & JSON View Logic
-    // ============================================================
-
-    // --- Usage Audit ---
-    $(document).on('click', '.d5tm-usage-btn', function() {
-        var id = $(this).data('id');
-        var $modal = $('#d5tm-usage-modal');
-        var $results = $('#d5tm-usage-results');
-
-        $results.html('<div style="padding:20px; text-align:center;"><i class="bi bi-arrow-repeat d5tm-spin"></i> Scanning database...</div>');
-        $modal.fadeIn(200).addClass('active');
-
-        $.ajax({
-            url: d5tm_ajax.ajax_url,
-            type: 'POST',
-            data: {
-                action: 'd5tm_get_layout_usage',
-                layout_id: id,
-                nonce: d5tm_ajax.nonce
-            },
-            success: function(response) {
-                if (response.success) {
-                    var usage = response.data.usage;
-                    if (usage.length === 0) {
-                        $results.html('<div style="padding:30px; text-align:center; color: var(--text-3);"><i class="bi bi-check-circle" style="font-size: 2rem; display:block; margin-bottom:10px; color:#10b981;"></i> This layout is not currently linked or embedded in any published content. It is safe to delete.</div>');
-                    } else {
-                        var html = '';
-                        usage.forEach(function(item) {
-                            html += '<div class="d5tm-usage-item">' +
-                                        '<div class="d5tm-usage-info">' +
-                                            '<a href="' + item.edit_url + '" target="_blank" class="d5tm-usage-title">' + item.title + '</a>' +
-                                            '<span class="d5tm-usage-meta">' + item.type + ' (ID: ' + item.id + ')</span>' +
-                                        '</div>' +
-                                        '<a href="' + item.edit_url + '" target="_blank" class="d5tm-btn d5tm-btn-secondary" style="padding:4px 10px; font-size:0.75rem;">Edit Content</a>' +
-                                    '</div>';
-                        });
-                        $results.html(html);
-                    }
-                } else {
-                    $results.html('<div style="padding:20px; color: #ef4444;">Error: ' + response.data.message + '</div>');
-                }
-            }
-        });
-    });
-
-    $('#d5tm-usage-close-btn, #d5tm-usage-ok-btn').on('click', function() {
-        $('#d5tm-usage-modal').fadeOut(200).removeClass('active');
-    });
-
     // --- JSON View ---
     $(document).on('click', '.d5tm-json-btn', function() {
         var id = $(this).data('id');
@@ -1116,10 +1066,7 @@ jQuery(document).ready(function ($) {
             success: function(response) {
                 if (response.success) {
                     try {
-                        // Divi 5 data might be block markup string.
-                        // We attempt to find the JSON parts or just beautify the whole block structure.
                         var content = response.data.layout_data;
-                        // For display, we just want it to look spaced and readable.
                         $viewer.text(content);
                     } catch(e) {
                         $viewer.text(response.data.layout_data);
@@ -1144,75 +1091,13 @@ jQuery(document).ready(function ($) {
         $('#d5tm-json-modal').fadeOut(200).removeClass('active');
     });
 
-    // ============================================================
-    // v3.1.0 — Global Usage Tab Logic
-    // ============================================================
-    
-    var usageReportLoaded = false;
+    // Refresh Dashboard
 
-    $(document).on('click', '.d5tm-htab[data-target="usage-audit-all-tab"]', function() {
-        if (!usageReportLoaded) {
-            loadGlobalUsageReport();
-        }
-    });
-
-    function loadGlobalUsageReport() {
-        var $tbody = $('#d5tm-global-usage-table tbody');
-        
-        $.ajax({
-            url: d5tm_ajax.ajax_url,
-            type: 'POST',
-            data: {
-                action: 'd5tm_get_global_usage_report',
-                nonce: d5tm_ajax.nonce
-            },
-            success: function(response) {
-                if (response.success) {
-                    var report = response.data.report;
-                    if (report.length === 0) {
-                        $tbody.html('<tr><td colspan="5" style="text-align:center; padding:40px;">No layouts found.</td></tr>');
-                    } else {
-                        var html = '';
-                        report.forEach(function(item) {
-                            var pagesHtml = '';
-                            if (item.pages.length === 0) {
-                                pagesHtml = '<span style="color:#94a3b8; font-style:italic;">Not used</span>';
-                            } else {
-                                item.pages.forEach(function(p, index) {
-                                    pagesHtml += '<a href="' + p.url + '" target="_blank" style="color:var(--brand); text-decoration:none;">' + p.title + '</a>';
-                                    if (index < item.pages.length - 1) pagesHtml += ', ';
-                                });
-                            }
-
-                            html += '<tr class="d5tm-report-row">' +
-                                        '<td><strong>' + item.title + '</strong></td>' +
-                                        '<td><span class="d5tm-pill">' + item.category + '</span></td>' +
-                                        '<td><span class="d5tm-usage-count-badge">' + item.count + '</span></td>' +
-                                        '<td style="max-width:300px;">' + pagesHtml + '</td>' +
-                                        '<td>' +
-                                            '<button type="button" class="d5tm-btn d5tm-btn-secondary d5tm-json-btn" data-id="' + item.id + '" style="padding:4px 8px; font-size:0.75rem;">' +
-                                                '<i class="bi bi-code-slash"></i> JSON' +
-                                            '</button>' +
-                                        '</td>' +
-                                    '</tr>';
-                        });
-                        $tbody.html(html);
-                        usageReportLoaded = true;
-                    }
-                } else {
-                    $tbody.html('<tr><td colspan="5" style="text-align:center; color:#ef4444; padding:20px;">Error loading report.</td></tr>');
-                }
-            }
-        });
-    }
-
-    // Refresh Usage Audit Tab
-    $(document).on('click', '.d5tm-action-refresh', function() {
-        if ($('.d5tm-htab.active').data('target') === 'usage-audit-all-tab') {
-            usageReportLoaded = false;
-            $('#d5tm-global-usage-table tbody').html('<tr><td colspan="5" style="text-align:center; padding: 40px;"><i class="bi bi-arrow-repeat d5tm-spin"></i> Analyzing content...</td></tr>');
-            loadGlobalUsageReport();
-        }
+    $('.d5tm-action-refresh').on('click', function(e) {
+        e.preventDefault();
+        var $icon = $(this).find('.dashicons');
+        $icon.addClass('dashicons-update-spin');
+        window.location.reload();
     });
 
 });

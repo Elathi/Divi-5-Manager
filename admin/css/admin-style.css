@@ -1085,6 +1085,27 @@
     overflow-y: auto;
 }
 
+.d5tm-modal-lg {
+    width: 1000px !important;
+    max-width: 95% !important;
+}
+
+.d5tm-json-pre {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+    white-space: pre-wrap;       /* Enable wrapping */
+    word-break: break-all;      /* Break long strings */
+    max-height: 60vh;
+    overflow-y: auto;
+    margin: 0;
+}
+
 .d5tm-modal-body form {
     display: grid;
     grid-template-columns: 1fr 200px;
@@ -1743,29 +1764,11 @@ i.d5tm-empty-icon { font-size: 48px; }
    v2.7.0 — UX Polish & Category Management Styles
    ============================================================ */
 
-/* === Skeleton Shimmer Animation === */
-@keyframes d5tm-shimmer {
-    0%   { transform: translateX(-100%); }
-    100% { transform: translateX(200%); }
-}
-
+/* === Skeleton Thumbnail Base === */
 .d5tm-thumb--skeleton {
     position: relative;
     overflow: hidden;
-}
-
-.d5tm-thumb--skeleton::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        105deg,
-        transparent 40%,
-        rgba(255, 255, 255, 0.45) 50%,
-        transparent 60%
-    );
-    animation: d5tm-shimmer 2.2s infinite ease-in-out;
-    pointer-events: none;
+    min-height: 120px;
 }
 
 /* === Card Filter Transitions === */

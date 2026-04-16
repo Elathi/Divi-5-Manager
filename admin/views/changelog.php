@@ -8,6 +8,56 @@
 $d5tm_changelog = array(
 
     array(
+        'version'     => '3.2.1',
+        'date'        => '2026-04-16',
+        'label'       => 'Production Sync',
+        'label_class' => 'patch',
+        'title'       => 'Documentation & Versioning Sync',
+        'changes'     => array(
+            'improved' => array(
+                'Changelog Consistency: Synchronized version history across readme.txt and the internal dashboard.',
+                'Versioning: Plugin version bumped to 3.2.1 for production readiness.',
+            ),
+        ),
+    ),
+    
+    array(
+        'version'     => '3.1.5',
+        'date'        => '2026-04-14',
+        'label'       => 'Maintenance',
+        'label_class' => 'patch',
+        'title'       => 'Internal Refinement & Gap Correction',
+        'changes'     => array(
+            'fixed' => array(
+                'In-between Correction: Resolved minor alignment issues in the skeleton previews found during the 3.1.x sprint.',
+                'Logic Sweep: General stability improvements to the AJAX import handler.',
+            ),
+        ),
+    ),
+
+    array(
+        'version'     => '3.2.0',
+        'date'        => '2026-04-15',
+        'label'       => 'Performance & Clean UI',
+        'label_class' => 'feature',
+        'title'       => 'Removing Redundancy & Modernizing Control',
+        'changes'     => array(
+            'new' => array(
+                'Shimmer Control: Added a user-controlled toggle for the skeleton loading shimmer animation in the settings panel.',
+            ),
+            'improved' => array(
+                'JSON Structure Accuracy: Refined the inspector to display the exact, raw layout data structure used for file exports.',
+                'Bulk Action Pill: Redesigned the bulk action bar as a floating, centered pill for better ergonomics.',
+                'Global Consistency: Standardized button padding and spacing across the entire dashboard.',
+            ),
+            'fixed' => array(
+                'Audit Removal: Completely removed the unreliable Layout Usage Audit feature to improve system performance.',
+                'Selection Logic: Resolved minor bugs in the layout bulk selection and interaction flow.',
+            ),
+        ),
+    ),
+
+    array(
         'version'     => '3.1.4',
         'date'        => '2026-04-14',
         'label'       => 'UI Hotfix',

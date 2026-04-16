@@ -3,11 +3,11 @@
  * Plugin Name:       Divi 5 Template Manager
  * Plugin URI:        https://divi.elathi.xyz
  * Description:       A professional asset library to browse, manage, preview, import, and export Divi 5 layouts and templates.
- * Version:           3.1.4
+ * Version:           3.2.1
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Tested up to:      6.7
- * Stable tag:        3.1.4
+ * Stable tag:        3.2.1
  * Author:            S. Anand Kumar
  * Author URI:        https://elathi.xyz
  * License:           GPL-2.0+
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
-define( 'DIVI5_TM_VERSION', '3.1.4' );
+define( 'DIVI5_TM_VERSION', '3.2.1' );
 define( 'DIVI5_TM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'DIVI5_TM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
@@ -59,92 +59,6 @@ class Divi5_Template_Manager {
         // v3.0 Batch Editor Hooks
         add_action( 'wp_ajax_d5tm_batch_update', array( $this, 'ajax_batch_update' ) );
         add_action( 'wp_ajax_d5tm_batch_trash', array( $this, 'ajax_batch_trash' ) );
-        add_action( 'wp_ajax_d5tm_get_layout_usage', array( $this, 'ajax_get_layout_usage' ) );
-        add_action( 'wp_ajax_d5tm_get_global_usage_report', array( $this, 'ajax_get_global_usage_report' ) );
-    }
-
-    /**
-     * Global Usage Audit: Map all layouts to all deployments site-wide
-     */
-    public function ajax_get_global_usage_report() {
-        check_ajax_referer( 'd5tm_import_nonce', 'nonce' );
-        if ( ! current_user_can( 'edit_posts' ) ) wp_send_json_error( array( 'message' => 'Permission denied.' ) );
-
-        global $wpdb;
-
-        // 1. Get all layouts
-        $layouts = $wpdb->get_results( "SELECT ID, post_title FROM $wpdb->posts WHERE post_type = 'et_pb_layout' AND post_status = 'publish'" );
-        
-        // 2. Get all pages/posts where patterns might exist
-        $sources = $wpdb->get_results( "SELECT ID, post_title, post_content, post_type FROM $wpdb->posts WHERE post_status = 'publish' AND post_type IN ('post', 'page', 'et_pb_layout')" );
-
-        $report = array();
-        foreach ( $layouts as $layout ) {
-            $lid = $layout->ID;
-            $search_pattern = '"id":' . $lid;
-            $deployed_on = array();
-
-            foreach ( $sources as $source ) {
-                if ( stripos( $source->post_content, $search_pattern ) !== false ) {
-                    $deployed_on[] = array(
-                        'title' => $source->post_title,
-                        'url'   => get_edit_post_link( $source->ID )
-                    );
-                }
-            }
-
-            // Get Category
-            $cats = get_the_terms( $lid, 'layout_category' );
-            $cat_name = ($cats && !is_wp_error($cats)) ? $cats[0]->name : 'Uncategorized';
-
-            $report[] = array(
-                'id'       => $lid,
-                'title'    => $layout->post_title,
-                'category' => $cat_name,
-                'count'    => count( $deployed_on ),
-                'pages'    => $deployed_on
-            );
-        }
-
-        wp_send_json_success( array( 'report' => $report ) );
-    }
-
-    /**
-     * Usage Audit: Find where layout is used in post_content
-     */
-    public function ajax_get_layout_usage() {
-        check_ajax_referer( 'd5tm_import_nonce', 'nonce' );
-        if ( ! current_user_can( 'edit_posts' ) ) wp_send_json_error( array( 'message' => 'Permission denied.' ) );
-
-        $layout_id = isset( $_POST['layout_id'] ) ? intval( $_POST['layout_id'] ) : 0;
-        if ( ! $layout_id ) wp_send_json_error( array( 'message' => 'Invalid ID.' ) );
-
-        global $wpdb;
-        
-        // Search for block patterns: <!-- wp:divi/layout {"id":123} --> or similar
-        // We look for the ID inside the layout block JSON
-        $search_string = '"id":' . $layout_id;
-        
-        $results = $wpdb->get_results( $wpdb->prepare(
-            "SELECT ID, post_title, post_type FROM $wpdb->posts 
-             WHERE post_content LIKE %s 
-             AND post_status = 'publish' 
-             AND post_type IN ('post', 'page', 'et_pb_layout')
-             LIMIT 50",
-            '%' . $wpdb->esc_like( $search_string ) . '%'
-        ) );
-
-        $usage = array();
-        foreach ( $results as $row ) {
-            $usage[] = array(
-                'id'    => $row->ID,
-                'title' => $row->post_title,
-                'type'  => $row->post_type,
-                'edit_url' => get_edit_post_link( $row->ID )
-            );
-        }
-
-        wp_send_json_success( array( 'usage' => $usage ) );
     }
 
     /**
@@ -209,8 +123,21 @@ class Divi5_Template_Manager {
         // We just need the raw block markup text. 
         $raw_content = $post->post_content;
 
+        // Package as Divi JSON structure - exact match for export format
+        $json_export = array(
+            'context' => 'et_builder_layouts',
+            'data'    => array(
+                $layout_id => array(
+                    'post_title'   => $post->post_title,
+                    'post_content' => $post->post_content,
+                    'post_status'  => 'publish',
+                    'post_type'    => 'et_pb_layout'
+                )
+            )
+        );
+
         wp_send_json_success( array( 
-            'layout_data' => $raw_content,
+            'layout_data' => wp_json_encode( $json_export ),
             'message'     => 'Success' 
         ) );
     }

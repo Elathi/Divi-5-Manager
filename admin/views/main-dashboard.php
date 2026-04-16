@@ -126,7 +126,7 @@ $skeleton_branding = get_option( 'd5tm_skeleton_branding', 'off' ) === 'on';
 
         <nav class="d5tm-header-tabs">
             <button class="d5tm-htab active" data-target="browse-tab" data-tooltip="<?php esc_attr_e( 'View and filter your library', 'divi5-tm' ); ?>"><i class="bi bi-collection"></i> <?php esc_html_e( 'Browse Layouts', 'divi5-tm' ); ?></button>
-            <button class="d5tm-htab" data-target="usage-audit-all-tab" data-tooltip="<?php esc_attr_e( 'View site-wide layout usage report', 'divi5-tm' ); ?>"><i class="bi bi-diagram-2"></i> <?php esc_html_e( 'Usage Audit', 'divi5-tm' ); ?></button>
+
             <button class="d5tm-htab" data-target="import-tab" data-tooltip="<?php esc_attr_e( 'Upload and categorize Divi JSON files', 'divi5-tm' ); ?>"><i class="bi bi-cloud-upload"></i> <?php esc_html_e( 'Import Layout', 'divi5-tm' ); ?></button>
             <button class="d5tm-htab" data-target="settings-tab" data-tooltip="<?php esc_attr_e( 'Configure plugin preferences', 'divi5-tm' ); ?>">
                 <i class="bi bi-sliders"></i>
@@ -378,9 +378,7 @@ $skeleton_branding = get_option( 'd5tm_skeleton_branding', 'off' ) === 'on';
                                                 <button type="button" class="d5tm-footer-icon d5tm-copy-id-btn" data-id="<?php echo esc_attr( $layout->ID ); ?>" data-tooltip="<?php esc_attr_e( 'Copy Layout ID', 'divi5-tm' ); ?>">
                                                     <i class="bi bi-clipboard"></i>
                                                 </button>
-                                                <button type="button" class="d5tm-footer-icon d5tm-usage-btn" data-id="<?php echo esc_attr( $layout->ID ); ?>" data-tooltip="<?php esc_attr_e( 'Layout Usage Audit', 'divi5-tm' ); ?>">
-                                                    <i class="bi bi-diagram-2"></i>
-                                                </button>
+
                                                 <button type="button" class="d5tm-footer-icon d5tm-json-btn" data-id="<?php echo esc_attr( $layout->ID ); ?>" data-tooltip="<?php esc_attr_e( 'View JSON Structure', 'divi5-tm' ); ?>">
                                                     <i class="bi bi-code-slash"></i>
                                                 </button>
@@ -394,7 +392,7 @@ $skeleton_branding = get_option( 'd5tm_skeleton_branding', 'off' ) === 'on';
                                                     </button>
                                                 <?php else : ?>
                                                     <?php if ( $show_download ) : ?>
-                                                        <button type="button" class="d5tm-footer-icon d5tm-download-btn" data-id="<?php echo esc_attr( $layout->ID ); ?>" data-tooltip="<?php esc_attr_e( 'Download JSON', 'divi5-tm' ); ?>">
+                                                        <button type="button" class="d5tm-footer-icon d5tm-download-btn d5tm-action-download" data-id="<?php echo esc_attr( $layout->ID ); ?>" data-tooltip="<?php esc_attr_e( 'Download JSON', 'divi5-tm' ); ?>">
                                                             <i class="bi bi-download"></i>
                                                         </button>
                                                     <?php endif; ?>
@@ -421,9 +419,11 @@ $skeleton_branding = get_option( 'd5tm_skeleton_branding', 'off' ) === 'on';
                                             <?php endif; ?>
                                             
                                             <?php if ( ! empty( $tag_names ) ) : ?>
-                                                <span class="d5tm-pill">
-                                                    <i class="bi bi-tag"></i> <?php echo esc_html( implode( ', ', array_column( array_slice($tag_names, 0, 2), 'name' ) ) ); ?>
-                                                </span>
+                                                <?php foreach ( array_slice( $tag_names, 0, 3 ) as $tag ) : ?>
+                                                    <span class="d5tm-pill">
+                                                        <i class="bi bi-tag"></i> <?php echo esc_html( $tag['name'] ); ?>
+                                                    </span>
+                                                <?php endforeach; ?>
                                             <?php endif; ?>
                                         </div>
                                     </div>
@@ -488,33 +488,7 @@ $skeleton_branding = get_option( 'd5tm_skeleton_branding', 'off' ) === 'on';
         </div>
     </div>
 
-    <!-- ===== USAGE AUDIT TAB ===== -->
-    <div id="usage-audit-all-tab" class="d5tm-tab">
-        <div class="d5tm-usage-report-container">
-            <div class="d5tm-report-header">
-                <h2><i class="bi bi-diagram-2"></i> Site-Wide Layout Usage Report</h2>
-                <p>This report scans all published pages and posts to map where your layouts are currently active.</p>
-            </div>
-            
-            <div class="d5tm-report-table-wrap">
-                <table class="d5tm-report-table" id="d5tm-global-usage-table">
-                    <thead>
-                        <tr>
-                            <th>Layout Name</th>
-                            <th>Category</th>
-                            <th>Usage Count</th>
-                            <th>Deployed On</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Populated by AJAX -->
-                        <tr><td colspan="5" style="text-align:center; padding: 40px;"><i class="bi bi-arrow-repeat d5tm-spin"></i> Analyzing content...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+
 
     <!-- ===== IMPORT TAB ===== -->
     <div id="import-tab" class="d5tm-tab">
@@ -658,14 +632,15 @@ $skeleton_branding = get_option( 'd5tm_skeleton_branding', 'off' ) === 'on';
                         </div>
                     </div>
 
-                    <!-- Feature: Usage Intelligence -->
+                    <!-- Feature: Management -->
                     <div class="d5tm-guide-item">
-                        <div class="d5tm-guide-icon"><i class="bi bi-diagram-2-fill"></i></div>
+                        <div class="d5tm-guide-icon"><i class="bi bi-folder-fill"></i></div>
                         <div class="d5tm-guide-text">
-                            <h3>Usage Intelligence</h3>
-                            <p>Use the <strong>Usage Audit</strong> tab for a site-wide report, or click the <strong>Diagram icon</strong> on any card to see exactly where a layout is deployed on your site before editing.</p>
+                            <h3>High-Efficiency Cards</h3>
+                            <p>Actions like <strong>JSON Inspection, Download, and Trash</strong> are now inline with the title for instant access. Hover the preview thumbnail for a centered live-preview shortcut.</p>
                         </div>
                     </div>
+
 
                     <!-- Feature: Management -->
                     <div class="d5tm-guide-item">
@@ -706,21 +681,21 @@ $skeleton_branding = get_option( 'd5tm_skeleton_branding', 'off' ) === 'on';
         </div>
     </div>
 
-    <!-- Usage Audit Modal -->
-    <div id="d5tm-usage-modal" class="d5tm-modal-overlay">
-        <div class="d5tm-modal">
+
+
+    <!-- JSON Structure Modal -->
+    <div id="d5tm-json-modal" class="d5tm-modal-overlay">
+        <div class="d5tm-modal d5tm-modal-lg">
             <div class="d5tm-modal-header">
-                <h2><i class="bi bi-diagram-3"></i> Layout Usage Audit</h2>
-                <button type="button" class="d5tm-modal-close" id="d5tm-usage-close-btn">&times;</button>
+                <h2><i class="bi bi-code-slash"></i> JSON Structure Inspector</h2>
+                <button type="button" class="d5tm-modal-close" id="d5tm-json-close-btn">&times;</button>
             </div>
             <div class="d5tm-modal-body">
-                <p class="d5tm-guide-text">Scanning theme and content for active usage of this layout...</p>
-                <div id="d5tm-usage-results" class="d5tm-usage-list">
-                    <!-- Results populated by AJAX -->
-                </div>
+                <pre id="d5tm-json-viewer" class="d5tm-json-pre"></pre>
             </div>
             <div class="d5tm-modal-footer">
-                <button type="button" class="d5tm-btn d5tm-btn-secondary" id="d5tm-usage-ok-btn">Close</button>
+                <button type="button" class="d5tm-btn d5tm-btn-primary d5tm-json-copy-btn">Copy JSON</button>
+                <button type="button" class="d5tm-btn d5tm-btn-secondary" id="d5tm-json-ok-btn">Close</button>
             </div>
         </div>
     </div>
@@ -743,6 +718,7 @@ $skeleton_branding = get_option( 'd5tm_skeleton_branding', 'off' ) === 'on';
     </div>
 
     <!-- Live Preview Modal -->
+
     <div id="d5tm-live-preview-modal" class="d5tm-lp-modal-overlay">
         <div class="d5tm-lp-modal">
             <div class="d5tm-lp-header">
