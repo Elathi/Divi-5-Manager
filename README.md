@@ -25,7 +25,7 @@ Because of this, **I highly welcome code reviews, pull requests, and suggestions
 
 *Note: This plugin is currently in active development. Please test on staging environments before using on a live site.*
 
-1. Download the latest release `.zip` file from the [Releases](link-to-your-releases-page) page.
+1. Download the latest release `.zip` file from the [Releases](https://github.com/Elathi/Divi-5-Manager/tree/main) page.
 2. Go to your WordPress Dashboard > **Plugins** > **Add New**.
 3. Click **Upload Plugin** and select the downloaded `.zip` file.
 4. Click **Install Now**, then **Activate**.
