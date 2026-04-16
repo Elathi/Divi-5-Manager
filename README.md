@@ -9,7 +9,6 @@ Currently, the default Divi Library uses the standard WordPress table view. This
 * **🎨 Visual Grid UI:** View your layouts as cards instead of a boring list.
 * **🌗 Light & Dark Mode:** Toggle the UI theme to match your preference.
 * **👁️ Responsive Quick Previews:** Preview layout designs in Desktop, Tablet, and Mobile views without opening the Divi Builder.
-* **🛡️ Layout Usage Audit:** Scan your site to see if a layout is actively being used on a page before you delete it.
 * **📥 1-Click JSON Management:** Export layouts directly from the card, or drag-and-drop `.json` files to import them.
 * **🔍 Live AJAX Search & Filtering:** Find exactly what you need instantly with sidebar taxonomy filters (Categories & Tags).
 * **⚡ Bulk Actions:** Select multiple layouts to assign categories, tags, or move to trash.
@@ -36,7 +35,6 @@ Because of this, **I highly welcome code reviews, pull requests, and suggestions
 - [x] Initial UI and Light/Dark mode
 - [x] Quick Previews (Desktop/Tablet/Mobile)
 - [x] JSON Export/Import functionality
-- [x] Usage Audit system
 - [ ] Code cleanup and security hardening
 - [ ] Performance optimizations for massive libraries
 - [ ] *Community suggestions (Open an issue to suggest features!)*
